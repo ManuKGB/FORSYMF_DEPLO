@@ -123,8 +123,8 @@ class ServiceController extends AbstractController
         );
         $err = $serializer->serialize($w, 'json');
         if ($current && $current->isDeleted()) {
-            $result = $serializer->serialize($current, 'json');
             $current->setDeleted(0);
+            $result = $serializer->serialize($current, 'json');
             $em->persist($current);
             $em->flush();
             return new JsonResponse($result, JsonResponse::HTTP_OK, [], true);

@@ -15,23 +15,23 @@ class Service
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(["getServ"])]
-    private $LibelleService;
+    private $libelleService;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(["getServ"])]
-    private $Description;
+    private $description;
 
     #[ORM\Column(type: 'integer')]
     #[Groups(["getServ"])]
-    private $Montant;
+    private $montant;
 
     #[ORM\Column(type: 'date')]
     #[Groups(["getServ"])]
-    private $DateFinServ;
+    private $dateFinServ;
 
     #[ORM\Column(type: 'boolean')]
     #[Groups(["getServ"])]
-    private $Deleted;
+    private $deleted;
 
     
 
@@ -43,60 +43,60 @@ class Service
 
     public function getLibelleService(): ?string
     {
-        return $this->LibelleService;
+        return $this->libelleService;
     }
 
     public function setLibelleService(string $LibelleService): self
     {
-        $this->LibelleService = $LibelleService;
+        $this->libelleService = $LibelleService;
 
         return $this;
     }
 
     public function getDescription(): ?string
     {
-        return $this->Description;
+        return $this->description;
     }
 
     public function setDescription(string $Description): self
     {
-        $this->Description = $Description;
+        $this->description = $Description;
 
         return $this;
     }
 
     public function getMontant():?int
     {
-        return $this->Montant;
+        return $this->montant;
     }
 
     public function setMontant(int $Montant): self
     {
-        $this->Montant = $Montant;
+        $this->montant = $Montant;
 
         return $this;
     }
 
     public function getDateFinServ(): ?\DateTimeInterface
     {
-        return $this->DateFinServ;
+        return $this->dateFinServ;
     }
 
     public function setDateFinServ(\DateTimeInterface $DateFinServ): self
     {
-        $this->DateFinServ = $DateFinServ;
+        $this->dateFinServ = $DateFinServ;
 
         return $this;
     }
 
     public function isDeleted(): ?bool
     {
-        return $this->Deleted;
+        return $this->deleted;
     }
 
     public function setDeleted(bool $Deleted): self
     {
-        $this->Deleted = $Deleted;
+        $this->deleted = $Deleted;
 
         return $this;
     }
