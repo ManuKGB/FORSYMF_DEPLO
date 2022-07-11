@@ -17,35 +17,35 @@ class Prestataire
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(["getPrest"])]
-    private $Nom;
+    private $nom;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(["getPrest"])]
-    private $Prenom;
+    private $prenom;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(["getPrest"])]
-    private $Email;
+    private $email;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(["getPrest"])]
-    private $Adresse;
+    private $adresse;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(["getPrest"])]
-    private $RaisonSocial;
+    private $raisonSocial;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(["getPrest"])]
-    private $Poste;
+    private $poste;
 
     #[ORM\Column(type: 'boolean')]
     #[Groups(["getPrest"])]
-    private $Actif;
+    private $actif;
 
     #[ORM\Column(type: 'boolean')]
     #[Groups(["getPrest"])]
-    private $Deleted;
+    private $deleted;
 
    
 
@@ -56,96 +56,96 @@ class Prestataire
 
     public function getNom(): ?string
     {
-        return $this->Nom;
+        return $this->nom;
     }
 
-    public function setNom(string $Nom): self
+    public function setNom(string $nom): self
     {
-        $this->Nom = $Nom;
+        $this->nom = $nom;
 
         return $this;
     }
 
     public function getPrenom(): ?string
     {
-        return $this->Prenom;
+        return $this->prenom;
     }
 
-    public function setPrenom(string $Prenom): self
+    public function setPrenom(string $prenom): self
     {
-        $this->Prenom = $Prenom;
+        $this->prenom = $prenom;
 
         return $this;
     }
 
     public function getEmail(): ?string
     {
-        return $this->Email;
+        return $this->email;
     }
 
-    public function setEmail(?string $Email): self
+    public function setEmail(?string $email): self
     {
-        $this->Email = $Email;
+        $this->email = $email;
 
         return $this;
     }
 
     public function getAdresse(): ?string
     {
-        return $this->Adresse;
+        return $this->adresse;
     }
 
-    public function setAdresse(?string $Adresse): self
+    public function setAdresse(?string $adresse): self
     {
-        $this->Adresse = $Adresse;
+        $this->adresse = $adresse;
 
         return $this;
     }
 
     public function getRaisonSocial(): ?string
     {
-        return $this->RaisonSocial;
+        return $this->raisonSocial;
     }
 
-    public function setRaisonSocial(?string $RaisonSocial): self
+    public function setRaisonSocial(?string $raisonSocial): self
     {
-        $this->RaisonSocial = $RaisonSocial;
+        $this->raisonSocial = $raisonSocial;
 
         return $this;
     }
 
     public function getPoste(): ?string
     {
-        return $this->Poste;
+        return $this->poste;
     }
 
     public function setPoste(string $Poste): self
     {
-        $this->Poste = $Poste;
+        $this->poste = $Poste;
 
         return $this;
     }
 
     public function isActif(): ?bool
     {
-        return $this->Actif;
+        return $this->actif;
     }
 
-    public function setActif(bool $Actif): self
+    public function setActif(bool $actif): self
     {
-        $this->Actif = $Actif;
+        $this->actif = $actif;
 
         return $this;
     }
 
     public function isDeleted(): ?bool
     {
-        return $this->Deleted;
+        return $this->deleted;
     }
 
-    public function setDeleted(bool $Deleted): self
+    public function setDeleted(bool $deleted): self
     {
-        $this->Deleted = $Deleted;
+        $this->deleted = $deleted;
 
         return $this;
     }

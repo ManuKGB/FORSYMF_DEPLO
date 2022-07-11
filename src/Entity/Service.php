@@ -21,7 +21,7 @@ class Service
     #[Groups(["getServ"])]
     private $Description;
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: '0')]
+    #[ORM\Column(type: 'integer')]
     #[Groups(["getServ"])]
     private $Montant;
 
@@ -65,12 +65,12 @@ class Service
         return $this;
     }
 
-    public function getMontant(): ?string
+    public function getMontant():?int
     {
         return $this->Montant;
     }
 
-    public function setMontant(string $Montant): self
+    public function setMontant(int $Montant): self
     {
         $this->Montant = $Montant;
 

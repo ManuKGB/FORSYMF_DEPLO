@@ -16,71 +16,158 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class PrestataireController extends AbstractController
 {
-    #[Route('/api/prestataire', name: 'all_prest',methods:['GET'])]
-    public function getAllPres(PrestataireRepository $Prestataire,SerializerInterface $serializer):JsonResponse
+    // VALIDER
+    #[Route('/api/prestataire', name: 'all_prest', methods: ['GET'])]
+    public function getAllPres(PrestataireRepository $Prestataire, SerializerInterface $serializer): JsonResponse
     {
-        $pre=$Prestataire->findBy(
-            array('Deleted'=> 0),
+        $pre = $Prestataire->findBy(
+            array('deleted' => 0),
         );
-        $result = $serializer->serialize($pre, 'json',['groups'=>'getPrest']);
+        $result = $serializer->serialize($pre, 'json', ['groups' => 'getPrest']);
         //return $this->json($result);
-        return new JsonResponse($result, Response::HTTP_OK, [],true);
-        
+        return new JsonResponse($result, Response::HTTP_OK, [], true);
     }
 
+    // VALIDER
+    #[Route('/api/prestataire/deleted', name: 'all_pres_deleted', methods: ['GET'])]
+    public function getDeletedPres(PrestataireRepository $Prestataire, SerializerInterface $serializer): JsonResponse
+    {
+        $pre = $Prestataire->findBy(
+            array('deleted' => 1),
+        );
+        $result = $serializer->serialize($pre, 'json', ['groups' => 'getPrest']);
+        //return $this->json($result);
+        return new JsonResponse($result, Response::HTTP_OK, [], true);
+    }
 
-    #[Route('/api/prestataire/{id}',name:'one_prest',methods:['GET'])]
-    public function getOnePres(Prestataire $prestataire ,SerializerInterface $serializer): JsonResponse
+    // VALIDER
+    #[Route('/api/prestataire/{id}', name: 'one_prest', methods: ['GET'])]
+    public function getOnePres(Prestataire $prestataire, SerializerInterface $serializer): JsonResponse
     {
         $result = $serializer->serialize($prestataire, 'json');
-        if ($prestataire && !$prestataire->isDeleted()) {      
+        if ($prestataire && !$prestataire->isDeleted()) {
             return new JsonResponse($result, Response::HTTP_OK, [], true);
-        }else{
-            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+        } elseif ($prestataire && $prestataire->isDeleted()) {
+            $x = array(
+                "status" => JsonResponse::HTTP_NOT_FOUND,
+                "message" => "Object not found!"
+            );
+            $err = $serializer->serialize($x, 'json');
+            return new JsonResponse($err, JsonResponse::HTTP_NOT_FOUND, [], true);
         }
     }
 
-    #[Route('/api/prestataire/save',methods:['POST'])]
-    public function saveAuteur(Request $requete ,SerializerInterface $serializer,EntityManagerInterface $em,
-    ValidatorInterface $validator):JsonResponse
-    {
-        $pre=$serializer->deserialize($requete->getContent(),Prestataire::class,'json');
+    // VALIDER
+    #[Route('/api/prestataire/save', methods: ['POST'])]
+    public function savePres(
+        Request $requete,
+        SerializerInterface $serializer,
+        EntityManagerInterface $em,
+        ValidatorInterface $validator,
+        PrestataireRepository $Prestataire
+    ): JsonResponse {
+        $pre = $serializer->deserialize($requete->getContent(), Prestataire::class, 'json');
+
         $errors = $validator->validate($pre);
         if ($errors->count() > 0) {
             return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
         }
-        $pre->setDeleted(false);
-        $em->persist($pre);
-        $em->flush();
-        $jsonBook = $serializer->serialize($pre, 'json');
-        return new JsonResponse($jsonBook, Response::HTTP_CREATED,[],true);
-
+        $X = $Prestataire->findBy(
+            array(
+                'nom' => $pre->getNom(),
+                'prenom' => $pre->getPrenom()
+            )
+        );
+        if (count($X) == 0) {
+            $pre->setDeleted(false);
+            $pre->setActif(true);
+            $em->persist($pre);
+            $em->flush();
+            $jsonBook = $serializer->serialize($pre, 'json');
+            return new JsonResponse($jsonBook, Response::HTTP_CREATED, [], true);
+        } else {
+            $x = array(
+                "status" => JsonResponse::HTTP_ALREADY_REPORTED,
+                "message" => "Prestataire deja enregistrer!"
+            );
+            $err = $serializer->serialize($x, 'json');
+            return new JsonResponse($err, JsonResponse::HTTP_ALREADY_REPORTED, [], true);
+        }
     }
 
-    #[Route('/api/prestataire/update/{id}',methods:['PUT'])]
+
+    // VALIDER
+    #[Route('/api/prestataire/update/{id}', methods: ['PUT'])]
     // #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour mettre à jour')]
-    public function updateBook(Request $request, SerializerInterface $serializer, Prestataire $current, EntityManagerInterface $em, 
-    ): JsonResponse 
-    {
-        $updpres = $serializer->deserialize($request->getContent(), 
-                Prestataire::class, 
-                'json', 
-                [AbstractNormalizer::OBJECT_TO_POPULATE => $current]);
-        $json=$serializer->serialize($updpres,'json');
-        $em->persist($updpres);
-        $em->flush();
-        return new JsonResponse($json, JsonResponse::HTTP_OK,[],true);
-   }
-
-   #[Route('/api/prestataire/delete/{id}', methods: ['DELETE'])]
-    // #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour supprimer un livre')]
-    public function deletePres(Prestataire $current, EntityManagerInterface $em,SerializerInterface $serializer): JsonResponse 
-    {
-        $current->setDeleted(true);
-        $em->persist($current);
-        $em->flush();
-        $result=$serializer->serialize($current,'json');
-        return new JsonResponse($result, Response::HTTP_OK,[],true);
+    public function updatePres(
+        Request $request,
+        SerializerInterface $serializer,
+        Prestataire $current,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+        if ($current && !$current->isDeleted()) {
+            $updpres = $serializer->deserialize(
+                $request->getContent(),
+                Prestataire::class,
+                'json',
+                [AbstractNormalizer::OBJECT_TO_POPULATE => $current]
+            );
+            $json = $serializer->serialize($updpres, 'json');
+            $em->persist($updpres);
+            $em->flush();
+            return new JsonResponse($json, JsonResponse::HTTP_OK, [], true);
+        } elseif ($current && $current->isDeleted()) {
+            $x = array(
+                "status" => JsonResponse::HTTP_NOT_FOUND,
+                "message" => "Object not found!"
+            );
+            $err = $serializer->serialize($x, 'json');
+            return new JsonResponse($err, JsonResponse::HTTP_NOT_FOUND, [], true);
+        }
     }
 
+
+    // VALIDER
+    #[Route('/api/prestataire/deleted/reload/{id}', methods: ['PUT'])]
+    public  function reloadDeleted(
+        SerializerInterface $serializer,
+        Prestataire $current,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $w = array(
+            "statut" => JsonResponse::HTTP_ALREADY_REPORTED,
+            "Message" => "Cet objet n'est pas supprimé!"
+        );
+        $result = $serializer->serialize($current, 'json');
+        $err = $serializer->serialize($w, 'json');
+        if ($current && $current->isDeleted()) {
+            $current->setDeleted(0);
+            $em->persist($current);
+            $em->flush();
+            return new JsonResponse($result, JsonResponse::HTTP_OK, [], true);
+        } elseif ($current && !$current->isDeleted()) {
+            return new JsonResponse($err, JsonResponse::HTTP_ALREADY_REPORTED, [], true);
+        }
+    }
+
+    // VALIDER
+    #[Route('/api/prestataire/delete/{id}', methods: ['DELETE'])]
+    // #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits suffisants pour supprimer un livre')]
+    public function deletePres(Prestataire $current, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
+    {
+        if ($current && !$current->isDeleted()) {
+            $current->setDeleted(true);
+            $em->persist($current);
+            $em->flush();
+            $result = $serializer->serialize($current, 'json');
+            return new JsonResponse($result, Response::HTTP_OK, [], true);
+        } elseif ($current && $current->isDeleted()) {
+            $x = array(
+                "status" => JsonResponse::HTTP_NOT_FOUND,
+                "message" => "Object not found!"
+            );
+            $err = $serializer->serialize($x, 'json');
+            return new JsonResponse($err, JsonResponse::HTTP_NOT_FOUND);
+        }
+    }
 }
