@@ -10,27 +10,27 @@ class Service
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["getServ"])]  
+    #[Groups(["getServ","get"])]  
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ","get"])]
     private $libelleService;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ","get"])]
     private $description;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ","get"])]
     private $montant;
 
     #[ORM\Column(type: 'date')]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ","get"])]
     private $dateFinServ;
 
     #[ORM\Column(type: 'boolean')]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ","get"])]
     private $deleted;
 
     #[ORM\ManyToOne(targetEntity: Prestataire::class, inversedBy: 'services')]

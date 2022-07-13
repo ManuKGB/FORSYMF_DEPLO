@@ -23,7 +23,7 @@ class PrestataireController extends AbstractController
         $pre = $Prestataire->findBy(
             array('deleted' => 0),
         );
-        $result = $serializer->serialize($pre, 'json', ['groups' => 'getServ']);
+        $result = $serializer->serialize($pre, 'json', ['groups' => 'get']);
         //return $this->json($result);
         return new JsonResponse($result, Response::HTTP_OK, [], true);
     }
@@ -35,7 +35,7 @@ class PrestataireController extends AbstractController
         $pre = $Prestataire->findBy(
             array('deleted' => 1),
         );
-        $result = $serializer->serialize($pre, 'json', ['groups' => 'getServ']);
+        $result = $serializer->serialize($pre, 'json', ['groups' => 'get']);
         //return $this->json($result);
         return new JsonResponse($result, Response::HTTP_OK, [], true);
     }
@@ -44,7 +44,7 @@ class PrestataireController extends AbstractController
     #[Route('/api/prestataire/{id}', name: 'one_prest', methods: ['GET'])]
     public function getOnePres(Prestataire $prestataire, SerializerInterface $serializer): JsonResponse
     {
-        $result = $serializer->serialize($prestataire, 'json',['groups' => 'getServ']);
+        $result = $serializer->serialize($prestataire, 'json',['groups' => 'get']);
         if ($prestataire && !$prestataire->isDeleted()) {
             return new JsonResponse($result, Response::HTTP_OK, [], true);
         } elseif ($prestataire && $prestataire->isDeleted()) {
@@ -112,7 +112,7 @@ class PrestataireController extends AbstractController
                 'json',
                 [AbstractNormalizer::OBJECT_TO_POPULATE => $current]
             );
-            $json = $serializer->serialize($updpres, 'json',["groups"=>"getServ"]);
+            $json = $serializer->serialize($updpres, 'json',["groups"=>"get"]);
             $em->persist($updpres);
             $em->flush();
             return new JsonResponse($json, JsonResponse::HTTP_OK, [], true);
@@ -141,7 +141,7 @@ class PrestataireController extends AbstractController
         $err = $serializer->serialize($w, 'json');
         if ($current && $current->isDeleted()) {
             $current->setDeleted(0);
-            $result = $serializer->serialize($current, 'json',["groups"=>"getServ"]);
+            $result = $serializer->serialize($current, 'json',["groups"=>"get"]);
             $em->persist($current);
             $em->flush();
             return new JsonResponse($result, JsonResponse::HTTP_OK, [], true);
@@ -159,7 +159,7 @@ class PrestataireController extends AbstractController
             $current->setDeleted(true);
             $em->persist($current);
             $em->flush();
-            $result = $serializer->serialize($current, 'json',["groups"=>"getServ"]);
+            $result = $serializer->serialize($current, 'json',["groups"=>"get"]);
             return new JsonResponse($result, Response::HTTP_OK, [], true);
         } elseif ($current && $current->isDeleted()) {
             $x = array(
@@ -167,7 +167,7 @@ class PrestataireController extends AbstractController
                 "message" => "Object not found!"
             );
             $err = $serializer->serialize($x, 'json');
-            return new JsonResponse($err, JsonResponse::HTTP_NOT_FOUND);
+            return new JsonResponse($err, JsonResponse::HTTP_NOT_FOUND,[],true);
         }
     }
 }

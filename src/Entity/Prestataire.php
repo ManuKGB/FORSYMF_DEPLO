@@ -14,42 +14,43 @@ class Prestataire
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ","get"])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ","get"])]
     private $nom;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ","get"])]
     private $prenom;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ","get"])]
     private $email;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ","get"])]
     private $adresse;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ","get"])]
     private $raisonSocial;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ","get"])]
     private $poste;
 
     #[ORM\Column(type: 'boolean')]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ","get"])]
     private $actif;
 
     #[ORM\Column(type: 'boolean')]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ","get"])]
     private $deleted;
 
     #[ORM\OneToMany(mappedBy: 'prestataire', targetEntity: Service::class)]
+    #[Groups(["get"])]
     private $services;
 
     public function __construct()
