@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PrestataireRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -12,40 +14,48 @@ class Prestataire
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["getPrest"])]
+    #[Groups(["getServ"])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["getPrest"])]
+    #[Groups(["getServ"])]
     private $nom;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["getPrest"])]
+    #[Groups(["getServ"])]
     private $prenom;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(["getPrest"])]
+    #[Groups(["getServ"])]
     private $email;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(["getPrest"])]
+    #[Groups(["getServ"])]
     private $adresse;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(["getPrest"])]
+    #[Groups(["getServ"])]
     private $raisonSocial;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["getPrest"])]
+    #[Groups(["getServ"])]
     private $poste;
 
     #[ORM\Column(type: 'boolean')]
-    #[Groups(["getPrest"])]
+    #[Groups(["getServ"])]
     private $actif;
 
     #[ORM\Column(type: 'boolean')]
-    #[Groups(["getPrest"])]
+    #[Groups(["getServ"])]
     private $deleted;
+
+    #[ORM\OneToMany(mappedBy: 'prestataire', targetEntity: Service::class)]
+    private $services;
+
+    public function __construct()
+    {
+        $this->services = new ArrayCollection();
+    }
 
    
 
@@ -146,6 +156,36 @@ class Prestataire
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Service>
+     */
+    public function getServices(): Collection
+    {
+        return $this->services;
+    }
+
+    public function addService(Service $service): self
+    {
+        if (!$this->services->contains($service)) {
+            $this->services[] = $service;
+            $service->setPrestataire($this);
+        }
+
+        return $this;
+    }
+
+    public function removeService(Service $service): self
+    {
+        if ($this->services->removeElement($service)) {
+            // set the owning side to null (unless already changed)
+            if ($service->getPrestataire() === $this) {
+                $service->setPrestataire(null);
+            }
+        }
 
         return $this;
     }

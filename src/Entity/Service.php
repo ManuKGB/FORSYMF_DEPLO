@@ -10,7 +10,7 @@ class Service
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["getServ"])]
+    #[Groups(["getServ"])]  
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -33,8 +33,11 @@ class Service
     #[Groups(["getServ"])]
     private $deleted;
 
-    
+    #[ORM\ManyToOne(targetEntity: Prestataire::class, inversedBy: 'services')]
+    #[Groups(["getServ"])]
+    private $prestataire;
 
+    
 
     public function getId(): ?int
     {
@@ -97,6 +100,18 @@ class Service
     public function setDeleted(bool $Deleted): self
     {
         $this->deleted = $Deleted;
+
+        return $this;
+    }
+
+    public function getPrestataire(): ?Prestataire
+    {
+        return $this->prestataire;
+    }
+
+    public function setPrestataire(?Prestataire $prestataire): self
+    {
+        $this->prestataire = $prestataire;
 
         return $this;
     }

@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Prestataire;
 use App\Entity\Service;
+use App\Repository\PrestataireRepository;
 use App\Repository\ServiceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -10,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -43,7 +46,7 @@ class ServiceController extends AbstractController
 
 
     // VALIDER
-    #[Route('/api/service/{id}', methods: ['GET'])]
+    #[Route('/api/service/{id}', methods: ['GET'],name:'getOneSer')]
     public function getOneSer(Service $ser, SerializerInterface $serializer): JsonResponse
     {
         $result = $serializer->serialize($ser, 'json', ['groups' => 'getServ']);
@@ -60,13 +63,15 @@ class ServiceController extends AbstractController
     }
 
 
-    // VALIDER
+    // VALIDER 
     #[Route('/api/service/save', methods: ['POST'])]
     public function saveServ(
         Request $requete,
         SerializerInterface $serializer,
         EntityManagerInterface $em,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        PrestataireRepository $Prestataire,
+        UrlGeneratorInterface $urlGenerator
     ): JsonResponse {
         $ser = $serializer->deserialize($requete->getContent(), Service::class, 'json');
         $errors = $validator->validate($ser);
@@ -74,10 +79,19 @@ class ServiceController extends AbstractController
             return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
         }
         $ser->setDeleted(false);
+        $contenu = $requete->toArray();
+        $idPrestataire=$contenu['idPrestataire'] ?? -1;
+        $ser->setPrestataire(
+                $Prestataire->find($idPrestataire));
         $em->persist($ser);
         $em->flush();
-        $jsonBook = $serializer->serialize($ser, 'json');
-        return new JsonResponse($jsonBook, Response::HTTP_CREATED, [], true);
+        $jsonBook = $serializer->serialize($ser, 'json',['groups' => 'getServ']);
+        $location = $urlGenerator->generate(
+            'getOneSer', 
+            ['id' => $ser->getId()], 
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        return new JsonResponse($jsonBook, Response::HTTP_CREATED,["Location" => $location], true);
     }
 
 // VALIDER
@@ -88,6 +102,7 @@ class ServiceController extends AbstractController
         SerializerInterface $serializer,
         Service $current,
         EntityManagerInterface $em,
+        PrestataireRepository $Prestataire
     ): JsonResponse {
         if ($current && !$current->isDeleted()) {
             $upd = $serializer->deserialize(
@@ -95,17 +110,21 @@ class ServiceController extends AbstractController
                 Service::class,
                 'json',
                 [AbstractNormalizer::OBJECT_TO_POPULATE => $current]
-            );
-            $json = $serializer->serialize($upd, 'json');
+            );  
+            $contenu = $request->toArray();
+            $idPrestataire=$contenu['idPrestataire'] ?? -1;
+            $upd->setPrestataire(
+                    $Prestataire->find($idPrestataire));
             $em->persist($upd);
             $em->flush();
+            $json = $serializer->serialize($upd, 'json',["groups"=>"getServ"]);
             return new JsonResponse($json, JsonResponse::HTTP_OK, [], true);
         } elseif ($current && $current->isDeleted()) {
             $x = array(
                 "status" => JsonResponse::HTTP_NOT_FOUND,
                 "message" => "Object not found!"
             );
-            $err = $serializer->serialize($x, 'json');
+            $err = $serializer->serialize($x, 'json',["groups"=>"getServ"]);
             return new JsonResponse($err, JsonResponse::HTTP_NOT_FOUND,[],true);
         }
     }
@@ -124,7 +143,7 @@ class ServiceController extends AbstractController
         $err = $serializer->serialize($w, 'json');
         if ($current && $current->isDeleted()) {
             $current->setDeleted(0);
-            $result = $serializer->serialize($current, 'json');
+            $result = $serializer->serialize($current, 'json',["groups"=>"getServ"]);
             $em->persist($current);
             $em->flush();
             return new JsonResponse($result, JsonResponse::HTTP_OK, [], true);
@@ -146,7 +165,7 @@ class ServiceController extends AbstractController
             $current->setDeleted(true);
             $em->persist($current);
             $em->flush();
-            $result = $serializer->serialize($current, 'json');
+            $result = $serializer->serialize($current, 'json',["groups"=>"getServ"]);
             return new JsonResponse($result, JsonResponse::HTTP_OK, [], true);
         } elseif ($current && $current->isDeleted()) {
             $x = array(
