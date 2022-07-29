@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
 class Notification
@@ -21,11 +23,22 @@ class Notification
 
     #[ORM\Column(type: 'text')]
     #[Groups(['getNotif'])]
+    #[Assert\NotBlank(message: "La saisie du contenu de la notification est importante.")]
     private $contenuNotif;
 
     #[ORM\Column(type: 'date')]
     #[Groups(['getNotif'])]
+    #[Assert\NotBlank(message: "La saisie de la date à laquelle la notification est apparue est importante.")]
     private $dateNotif;
+
+    #[ORM\ManyToOne(inversedBy: 'notifications')]
+    #[Groups(['getNotif'])]
+
+    private ?Taches $tache = null;
+
+   
+
+
 
     public function getId(): ?int
     {
@@ -67,4 +80,20 @@ class Notification
 
         return $this;
     }
+
+    public function getTache(): ?Taches
+    {
+        return $this->tache;
+    }
+
+    public function setTache(?Taches $tache): self
+    {
+        $this->tache = $tache;
+
+        return $this;
+    }
+
+
+
+  
 }

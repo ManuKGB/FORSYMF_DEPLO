@@ -16,60 +16,42 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        
-        // //creation de notifications
-        // $listNotif = [];
-        // for ($i = 0; $i < 10; $i++)
-        // {
-        //     $notif = new Notification();
-        //     $notif -> setCodeNotif('pople');
-        //     $notif -> setContenuNotif('Votre tache doit être terminé avant demain');
-            
-        //     $dts = new DateTime();
-        //     $date = $dts -> createFromFormat("y-m-d", date("y-m-d"));
-        //     $notif ->  setDateNotif($date);
-
-        //     $manager -> persist($notif);
-        //     //sauvegarde de l'auteur cree dans le tableau
-        //     $listNotif[] = $notif;
-        // }
 
 
 
+        //creons 10 taches
+       for($i=0; $i< 5; $i++)
+       {
+           $tache = new Taches;
+           $tache -> setResume('Faire le front : '.$i);
+           $tache -> setPriorite('onglet accueil');
 
-
-
-       //creons 10 taches
-    //    for($i=0; $i< 10; $i++)
-    //    {
-    //        $tache = new Taches;
-    //        $tache -> setResume('Faire le front : '.$i);
-    //        $tache -> setPriorite('onglet accueil');
-
-    //        $dts = new DateTime();
-    //        $datee = $dts -> createFromFormat("y-m-d", date("y-m-d"));
-    //        $tache -> setDateDebutProjet($datee);
+           $dts = new DateTime();
+           $datee = $dts -> createFromFormat("y-m-d", date("y-m-d"));
+           $tache -> setDateDebutProjet($datee);
            
-    //        $dt = new DateTime();
-    //        $date = $dt -> createFromFormat("y-m-d", date("y-m-d"));
-    //        $tache -> setDateFinEstimeProj($date);
+           $dt = new DateTime();
+           $date = $dt -> createFromFormat("y-m-d", date("y-m-d"));
+           $tache -> setDateFinEstimeProj($date);
 
-    //        $tache -> setMotifRetard('');
+           $tache -> setMotifRetard('');
 
-    //        $dte = new DateTime();
-    //        $dates = $dte -> createFromFormat("y-m-d", date("y-m-d"));
-    //        $tache -> setDateDerniereMiseAJour($dates);
+           $dte = new DateTime();
+           $dates = $dte -> createFromFormat("y-m-d", date("y-m-d"));
+           $tache -> setDateDerniereMiseAJour($dates);
+
+           $tache -> setActif(1);
            
-    //        $manager -> persist($tache);
-    //    } 
+           $manager -> persist($tache);
+       } 
 
-    //     $manager->flush();
+        $manager->flush();
 
 
 
 
          //creons 10 notifs
-       for($i=0; $i< 10; $i++)
+       for($i=0; $i< 5; $i++)
        {
            $notification = new Notification;
 
@@ -90,28 +72,32 @@ class AppFixtures extends Fixture
 
 
         //creation de projets
-        // for($i = 0; $i < 10; $i++)
-        // {
-        //     $projet = new Projet;
+        for($i = 0; $i < 5; $i++)
+        {
+            $projet = new Projet;
 
-        //     $dt = new DateTime();
-        //     $date = $dt -> createFromFormat("y-m-d", date("y-m-d")); 
-        //     $projet -> setDateDebutProj($date);
+            $dt = new DateTime();
+            $date = $dt -> createFromFormat("y-m-d", date("y-m-d")); 
+            $projet -> setDateDebutProj($date);
 
-        //     $projet -> setDateFinEstimeProj($date);
+            $projet -> setDateFinEstimeProj($date);
 
-        //     $projet -> setDateFinProj($date);
+            $projet -> setTitre ('Je suis le meilleur');
 
-        //     $projet -> setMontantInitialProj('150000');
+            $projet -> setDateFinProj($date);
 
-        //     $projet -> setMontantProj('200000');
+            $projet -> setMontantInitialProj('150000');
 
-        //     $projet -> setDateApprove($date);
+            $projet -> setMontantProj('200000');
 
-        // $manager -> persist($projet);
+            $projet -> setDateApprove($date);
+
+            $projet -> setActif(1);
+
+        $manager -> persist($projet);
             
-        // }
-        // $manager->flush();
+        }
+        $manager->flush();
 
 
 

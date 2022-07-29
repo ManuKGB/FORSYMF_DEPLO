@@ -9,14 +9,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class NotificationController extends AbstractController
 {
+
     #[Route('/api/notifications', name: 'allNotif', methods:['GET'])]
     public function getAllNotif(NotificationRepository $notificationRepository,
     SerializerInterface $serializer): JsonResponse
@@ -27,6 +28,7 @@ class NotificationController extends AbstractController
         Response::HTTP_OK,[], true); 
         
     }
+    
 
 
   
@@ -44,7 +46,7 @@ class NotificationController extends AbstractController
 
 
 
-    #[ROUTE('/api/notifications/{id}', name: 'deleteNotif', methods : ['DELETE'])]
+    #[ROUTE('/api/notifications/delete/{id}', name: 'deleteNotif', methods : ['DELETE'])]
     public function deleteNotif(Notification $notification, EntityManagerInterface $em) : JsonResponse
     {
         $em -> remove($notification);
@@ -55,12 +57,20 @@ class NotificationController extends AbstractController
 
 
 
-    #[Route('/api/notifications', name: "createNotif" , methods:['POST'])]
+    #[Route('/api/notifications/add', name: "createNotif" , methods:['POST'])]
     public function createNotif(Request $request, SerializerInterface
     $serializer, EntityManagerInterface $em, UrlGeneratorInterface
-    $urlGenerator): JsonResponse
+    $urlGenerator, ValidatorInterface $validator): JsonResponse
     {
-        $notification = $serializer -> deserialize($request -> getContent(), notification::class, 'json');
+        $notification = $serializer -> deserialize($request -> getContent(), Notification::class, 'json');
+
+        $error = $validator -> validate ($notification);
+
+        if($error -> count() > 0 )
+        {
+             return new JsonResponse($serializer -> serialize($error,'json'), JsonResponse::HTTP_BAD_REQUEST,[],true);
+            //throw new HttpException(JsonResponse::HTTP_BAD_REQUEST,"la reuête est invalide");
+        }
         $em -> persist($notification);
         $em -> flush();
 
@@ -79,12 +89,12 @@ class NotificationController extends AbstractController
 
 
 
-    #[Route('/api/notifications/{id}', name: "updateNotif", methods: ['PUT'])]
-    public function updateNotif(Request $request, SerializerInterface $serializer, notification $currentnotification,
+    #[Route('/api/notifications/update/{id}', name: "updateNotif", methods: ['PUT'])]
+    public function updateNotif(Request $request, SerializerInterface $serializer, Notification $currentnotification,
     EntityManagerInterface $em): JsonResponse
     {
         $updateNotif = $serializer -> deserialize ($request -> getContent(),
-        notification::class,'json',
+        Notification::class,'json',
         [AbstractNormalizer::OBJECT_TO_POPULATE => $currentnotification]);
         $em -> persist($updateNotif);
         $em -> flush();

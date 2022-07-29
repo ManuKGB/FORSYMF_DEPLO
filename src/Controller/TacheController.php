@@ -4,7 +4,9 @@ namespace App\Controller;
 
 // namespace App\TacheController;
 
+use App\Entity\Projet;
 use App\Entity\Taches;
+use App\Repository\ProjetRepository;
 use App\Repository\TachesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,6 +17,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 
 class TacheController extends AbstractController
 {
@@ -25,7 +29,9 @@ class TacheController extends AbstractController
     public function getTacheList(TachesRepository $tacheRepository,
     SerializerInterface $serializer): JsonResponse
     {
-        $tacheList = $tacheRepository -> findAll();
+        //dd();
+        //$tacheList = $tacheRepository -> findAll();
+        $tacheList = $tacheRepository -> findBy(array('actif' => 1));
         $jsonTacheList = $serializer -> serialize($tacheList, 'json', ["groups" => "gettaches"]);
         return new JsonResponse($jsonTacheList,
         Response::HTTP_OK,[], true); 
@@ -48,23 +54,72 @@ class TacheController extends AbstractController
 
 
 
-    #[ROUTE('/api/taches/{id}', name: 'DeleteTache', methods : ['DELETE'])]
-    public function deleteTache(Taches $taches, EntityManagerInterface $em) : JsonResponse
+    #[ROUTE('/api/taches/delete/{id}', name: 'DeleteTache', methods : ['DELETE'])]
+    public function deleteTache(Taches $taches, EntityManagerInterface $em, SerializerInterface $serializer) : JsonResponse
     {
-        $em -> remove($taches);
-        $em -> flush();
-
-        return new JsonResponse(null, Response :: HTTP_NO_CONTENT);
+        if($taches && $taches -> isActif())
+        {
+            $taches -> setActif(false);
+            $em -> persist($taches);
+            $em -> flush();
+            $mama = $serializer -> serialize($taches, 'json', ["groups" => "gettaches"]);
+            return new JsonResponse($mama, Response::HTTP_OK,
+            ['accept' => 'json'],true);
+        }
+        else if($taches && !$taches -> isActif())
+        {
+            $pov = array(
+                "statut" => JsonResponse::HTTP_NOT_FOUND,
+                "message" => 'Cette tâche a été supprimée',
+            );
+            $pova = $serializer->serialize($pov,'json');
+            return new JsonResponse($pova,JsonResponse::HTTP_NOT_FOUND,[],true);
+        }
     }
 
 
+   
 
-    #[Route('/api/taches', name: "createTache" , methods:['POST'])]
+
+    #[Route('/api/taches/update/{id}', name: "updateTaches", methods: ['PUT'])]
+    public function updateTache(Request $request, SerializerInterface $serializer, Taches $currentTache ,
+    EntityManagerInterface $em): JsonResponse
+    {
+        $updateTache = $serializer ->deserialize($request -> getContent(),
+        Taches::class,
+        'json',
+        [AbstractNormalizer::OBJECT_TO_POPULATE => $currentTache]);
+        $em -> persist($updateTache);
+        $em -> flush();
+
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+
+    } 
+
+
+
+    #[Route('/api/taches/add', name: "createTache" , methods:['POST'])]
     public function createTache(Request $request, SerializerInterface
     $serializer, EntityManagerInterface $em, UrlGeneratorInterface
-    $urlGenerator): JsonResponse
+    $urlGenerator, ValidatorInterface $validator, ProjetRepository $projetRepository): JsonResponse
     {
         $tache = $serializer -> deserialize($request -> getContent(), Taches::class, 'json');
+        
+        //On vérifie les erreurs
+         $error = $validator -> validate ($tache);
+         if($error -> count() > 0 )
+        {
+             return new JsonResponse($serializer -> serialize($error,'json'), JsonResponse::HTTP_BAD_REQUEST,[],true);
+            //throw new HttpException(JsonResponse::HTTP_BAD_REQUEST,"la reuête est invalide");
+        }
+        // $em -> persist($tache);
+        // $em -> flush();
+
+        $contenu =$request->toArray();
+        $projet_id = $contenu['projet_id']?? -1;
+        $tache-> setProjet($projetRepository-> find($projet_id));
+
+        $tache->setActif(true); 
         $em -> persist($tache);
         $em -> flush();
 
@@ -84,21 +139,7 @@ class TacheController extends AbstractController
 
 
 
-    #[Route('/api/taches/{id}', name: "updateTaches", methods: ['PUT'])]
     
-    public function updateTache(Request $request, SerializerInterface $serializer, Taches $currentTache ,
-    EntityManagerInterface $em): JsonResponse
-    {
-        $updateTache = $serializer ->deserialize($request -> getContent(),
-        Taches::class,
-        'json',
-        [AbstractNormalizer::OBJECT_TO_POPULATE => $currentTache]);
-        $em -> persist($updateTache);
-        $em -> flush();
-
-        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
-
-    }
 
 
 
