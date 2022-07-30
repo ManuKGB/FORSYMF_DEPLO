@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Prestataire;
 use App\Repository\PrestataireRepository;
+use App\Repository\ServiceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,9 +25,28 @@ class PrestataireController extends AbstractController
             array('deleted' => 0),
         );
         $result = $serializer->serialize($pre, 'json', ['groups' => 'get']);
+
         //return $this->json($result);
         return new JsonResponse($result, Response::HTTP_OK, [], true);
     }
+
+    #[Route('/api/prestataire/empty', name: 'not-ass', methods: ['GET'])]
+    public function getAllPresEmpty(PrestataireRepository $Prestataire, 
+      
+        SerializerInterface $serializer): JsonResponse
+    {
+        $x=[];
+         $pre = $Prestataire->findBy(
+            array('deleted' => 0),
+        );
+        foreach ($pre as $one) {
+            if ($one->getServices()->isEmpty() ) {
+            array_push($x, $one);            }         
+        }
+        $result = $serializer->serialize($x, 'json', ['groups' => 'get']);
+        return new JsonResponse($result, Response::HTTP_OK, [], true);
+    }
+
 
     // VALIDER
     #[Route('/api/prestataire/deleted', name: 'all_pres_deleted', methods: ['GET'])]

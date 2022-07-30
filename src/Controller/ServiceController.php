@@ -33,6 +33,16 @@ class ServiceController extends AbstractController
     }
 
 
+#[Route('/api/service/empty', name: 'not-assigned', methods: ['GET'])]     
+    public function getAllSerEmpt(ServiceRepository $Service, SerializerInterface $serializer): JsonResponse
+    {
+        $ser = $Service->findBy(
+            array('prestataire' => null),
+        );
+        $result = $serializer->serialize($ser, 'json', ['groups' => 'getServ']);
+        return new JsonResponse($result, Response::HTTP_OK, [], true);
+    }
+
     //VALIDER
     #[Route('/api/service/deleted', name: 'all_serv_deleted', methods: ['GET'])]
     public function getDeletedPres(ServiceRepository $Service, SerializerInterface $serializer): JsonResponse
@@ -79,6 +89,7 @@ class ServiceController extends AbstractController
             return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
         }
         $ser->setDeleted(false);
+	$ser->setActif(true);
         $contenu = $requete->toArray();
         $idPrestataire=$contenu['idPrestataire'] ?? -1;
         $ser->setPrestataire(
@@ -151,6 +162,32 @@ class ServiceController extends AbstractController
             return new JsonResponse($err, JsonResponse::HTTP_ALREADY_REPORTED, [], true);
         }
     }
+
+#[Route('/api/service/end/{id}', methods: ['PUT'])]
+    public  function endOneService(
+        SerializerInterface $serializer,
+        Service $current,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $w = array(
+            "statut" => JsonResponse::HTTP_ALREADY_REPORTED,
+            "Message" => "Cet service n'est pas actif"
+        );
+        $err = $serializer->serialize($w, 'json');
+        if ($current && !$current->isDeleted()) {
+            $current->setActif(0);
+            $result = $serializer->serialize($current, 'json',["groups"=>"getServ"]);
+            $em->persist($current);
+            $em->flush();
+            return new JsonResponse($result, JsonResponse::HTTP_OK, [], true);
+        } elseif ($current && !$current->isActif() ) {
+            return new JsonResponse($err, JsonResponse::HTTP_ALREADY_REPORTED, [], true);
+        }
+    }
+
+
+
+
 
 
     // VALIDER

@@ -37,6 +37,10 @@ class Service
     #[Groups(["getServ"])]
     private $prestataire;
 
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(["getServ","get"]) ]
+    private $actif;
+
     
 
     public function getId(): ?int
@@ -112,6 +116,18 @@ class Service
     public function setPrestataire(?Prestataire $prestataire): self
     {
         $this->prestataire = $prestataire;
+
+        return $this;
+    }
+
+    public function isActif(): ?bool
+    {
+        return $this->actif;
+    }
+
+    public function setActif(bool $actif): self
+    {
+        $this->actif = $actif;
 
         return $this;
     }
