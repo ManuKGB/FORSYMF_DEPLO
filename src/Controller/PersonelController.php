@@ -55,6 +55,25 @@ class PersonelController extends AbstractController
         return new JsonResponse($jsonperso, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 
+      
+    #[Route('api/admin/personel/nom/{username}', name: 'detailpersohy', methods: ['GET'])]
+
+    public function getusernameperso(PersonelRepository  $personel, SerializerInterface $serializer
+    , string  $username
+    ): JsonResponse 
+    {
+        $p=$personel->findOneBy(
+            array("username"=>$username)
+        );
+        // if(!$personel->isDeleted()){
+        //     $jsonperso = $serializer->serialize($personel, 'json',['groups'=>'getPersonel']);
+
+
+        // }
+        $jsonperso = $serializer->serialize($p, 'json',['groups'=>'getPersonel']);
+        return new JsonResponse($jsonperso, Response::HTTP_OK, ['accept' => 'json'],true);
+    }
+    
 
     //creation d un utilisateur
     /*
@@ -100,16 +119,16 @@ class PersonelController extends AbstractController
      
         $content = $request->toArray();
         $errors = $validator->validate($perso);
-
         if ($errors->count() > 0) {
             return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
         }
-
         $idDep=$content['idDepartement'] ?? -1;
         $idtyp=$content['IdType'];
         $perso->setDepartement($departementRepository->find($idDep));
         $perso->setTypePerso($type->find($idtyp));
         $perso->setDeleted(false);
+        $perso->setMdpChanged(false);
+        $perso->setNameChanged(false);
         $em->persist($perso);
         $em->flush();
 

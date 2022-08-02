@@ -95,6 +95,12 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     private ?bool $ischef = null;
+    #[Groups(["getPersonel"])]
+    #[ORM\Column(nullable: true)]
+    private ?bool $mdp_changed = null;
+    #[Groups(["getPersonel"])]
+    #[ORM\Column(nullable: true)]
+    private ?bool $name_changed = null;
 
     public function __construct()
     {
@@ -338,6 +344,30 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIschef(?bool $ischef): self
     {
         $this->ischef = $ischef;
+
+        return $this;
+    }
+
+    public function isMdpChanged(): ?bool
+    {
+        return $this->mdp_changed;
+    }
+
+    public function setMdpChanged(?bool $mdp_changed): self
+    {
+        $this->mdp_changed = $mdp_changed;
+
+        return $this;
+    }
+
+    public function isNameChanged(): ?bool
+    {
+        return $this->name_changed;
+    }
+
+    public function setNameChanged(?bool $name_changed): self
+    {
+        $this->name_changed = $name_changed;
 
         return $this;
     }
