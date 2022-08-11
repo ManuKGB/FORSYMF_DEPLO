@@ -65,7 +65,7 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
     private $contact;
 
     #[ORM\ManyToOne(targetEntity: Departement::class, inversedBy: 'personel')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(["getPersonel"])]
    
     private $departement;
@@ -80,7 +80,7 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
     private $chef;
     
     #[ORM\ManyToOne(targetEntity: TypePerso::class, inversedBy: 'Personel')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(["getPersonel"])]
     
     private $typePerso;
@@ -101,6 +101,9 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(["getPersonel"])]
     #[ORM\Column(nullable: true)]
     private ?bool $name_changed = null;
+
+    #[ORM\Column(length: 255,  nullable: true)]
+    private ?string $ProfileImage = null;
 
     public function __construct()
     {
@@ -371,4 +374,17 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getProfileImage(): ?string
+    {
+        return $this->ProfileImage;
+    }
+
+    public function setProfileImage(string $ProfileImage): self
+    {
+        $this->ProfileImage = $ProfileImage;
+
+        return $this;
+    }
+
 }
