@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Notification;
 use App\Repository\NotificationRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -71,6 +72,11 @@ class NotificationController extends AbstractController
              return new JsonResponse($serializer -> serialize($error,'json'), JsonResponse::HTTP_BAD_REQUEST,[],true);
             //throw new HttpException(JsonResponse::HTTP_BAD_REQUEST,"la reuête est invalide");
         }
+         
+            $notification->setcodeNotif('code441');
+        
+        
+        
         $em -> persist($notification);
         $em -> flush();
 

@@ -64,6 +64,10 @@ class Projet
 
     private Collection $taches;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['getprojet','gettaches'])]
+    private ?string $resumeProjet = null;
+
     public function __construct()
     {
         $this->taches = new ArrayCollection();
@@ -206,6 +210,18 @@ class Projet
                 $tach->setProjet(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getresumeProjet(): ?string
+    {
+        return $this->resumeProjet;
+    }
+
+    public function setresumeProjet(string $resumeProjet): self
+    {
+        $this->resumeProjet = $resumeProjet;
 
         return $this;
     }

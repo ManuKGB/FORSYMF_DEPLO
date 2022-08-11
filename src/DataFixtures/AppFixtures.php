@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+
 //use App\Entity\Notifications;
 
 use App\Entity\Notification;
@@ -10,6 +11,7 @@ use App\Entity\Taches;
 use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+
 
 
 class AppFixtures extends Fixture
@@ -125,4 +127,11 @@ class AppFixtures extends Fixture
     }
 
     
+// =======
+//         // $product = new Product();
+//         // $manager->persist($product);
+
+//         $manager->flush();
+//     }
+// >>>>>>> Caleb
 }

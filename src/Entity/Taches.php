@@ -10,12 +10,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TachesRepository::class)]
-class Taches 
+class Taches  
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['gettaches','getprojet'])]
+    #[Groups(['gettaches','getprojet',"getPersonel"])]
     private $id;
 
     #[ORM\Column(type: 'text')]
@@ -25,30 +25,30 @@ class Taches
     private $resume;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['gettaches','getprojet'])]
+    #[Groups(['gettaches','getprojet',"getPersonel"])]
     private $priorite;
 
     #[ORM\Column(type: 'date')]
-    #[Groups(['gettaches','getprojet'])]
+    #[Groups(['gettaches','getprojet',"getPersonel"])]
      #[Assert\NotBlank(message: "La date de début est importante.")]
     private $dateDebutProjet;
 
     #[ORM\Column(type: 'date')]
-    #[Groups(['gettaches','getprojet'])]
+    #[Groups(['gettaches','getprojet',"getPersonel"])]
     #[Assert\NotBlank(message: "vous devez saisie la sate de la fin du projet (date que vous avez estimé)")]
     private $dateFinEstimeProj;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['gettaches','getprojet'])]
+    #[Groups(['gettaches','getprojet',"getPersonel"])]
     private $motifRetard;
 
     #[ORM\Column(type: 'date', nullable: true)]
-    #[Groups(['gettaches','getprojet'])]
+    #[Groups(['gettaches','getprojet',"getPersonel"])]
 
     private $dateDerniereMiseAJour;
 
     #[ORM\Column]
-    #[Groups(['gettaches','getprojet'])]
+    #[Groups(['gettaches','getprojet',"getPersonel"])]
     private ?bool $actif = null;
 
     #[ORM\ManyToOne(inversedBy: 'taches')]
@@ -59,15 +59,30 @@ class Taches
     #[ORM\OneToMany(mappedBy: 'tache', targetEntity: Notification::class)]
     private Collection $notifications;
 
+    #[ORM\ManyToMany(targetEntity: Personel::class, inversedBy: 'taches')]
+    #[Groups(["getprojet"])]
+    private Collection $attribuer;
+
+    
+
     public function __construct()
     {
         $this->notifications = new ArrayCollection();
+        $this->attribuer = new ArrayCollection();
+    }
+    public function addtachePersonnel(Personel $personel)
+    {
+        if ($this->attribuer->contains($personel)){
+            return;
+        }
+        $this ->attribuer[] = $personel;
     }
 
     public function getId(): ?int
     {
         return $this->id;
     }
+ 
 
     public function getResume(): ?string
     {
@@ -193,6 +208,30 @@ class Taches
                 $notification->setTache(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Personel>
+     */
+    public function getAttribuer(): Collection
+    {
+        return $this->attribuer;
+    }
+
+    public function addAttribuer(Personel $attribuer): self
+    {
+        if (!$this->attribuer->contains($attribuer)) {
+            $this->attribuer[] = $attribuer;
+        }
+
+        return $this;
+    }
+
+    public function removeAttribuer(Personel $attribuer): self
+    {
+        $this->attribuer->removeElement($attribuer);
 
         return $this;
     }

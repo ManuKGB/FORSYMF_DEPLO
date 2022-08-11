@@ -4,8 +4,10 @@ namespace App\Controller;
 
 // namespace App\TacheController;
 
+use App\Entity\Personel;
 use App\Entity\Projet;
 use App\Entity\Taches;
+use App\Repository\PersonelRepository;
 use App\Repository\ProjetRepository;
 use App\Repository\TachesRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -96,6 +98,29 @@ class TacheController extends AbstractController
 
     } 
 
+    #[Route('/api/tachePersonel/add', name: "attribute" , methods: ['POST'])]
+    public function createTachePersonel(Request $request, TachesRepository $tachesRepository, PersonelRepository $personelRepository, SerializerInterface $serializer,EntityManagerInterface $em, ) : JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (count($data) > 0 && key_exists('tache', $data) && key_exists('personel', $data)) {
+            $tache = $tachesRepository->find($data['tache']);
+
+            if ($tache != null) {
+                $personel = $personelRepository->find($data['personel']);     
+                
+                if ($personel != null) {
+                    $tache->addAttribuer($personel);
+                    $em -> persist($tache);
+                    $em-> flush();
+                    return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+                }
+            }
+        }
+
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+    }
+
 
 
     #[Route('/api/taches/add', name: "createTache" , methods:['POST'])]
@@ -117,11 +142,41 @@ class TacheController extends AbstractController
 
         $contenu =$request->toArray();
         $projet_id = $contenu['projet_id']?? -1;
-        $tache-> setProjet($projetRepository-> find($projet_id));
+        $tache-> setProjet($projetRepository->find($projet_id));
 
         $tache->setActif(true); 
         $em -> persist($tache);
         $em -> flush();
+
+
+        $jsonTache = $serializer -> serialize($tache, 'json', ['groups' => 
+        'getTaches']);
+
+        $location = $urlGenerator -> generate('detailOfTache', ['id' => $tache ->
+        getId()] , UrlGeneratorInterface::ABSOLUTE_URL);
+
+        return new JsonResponse($jsonTache , Response:: HTTP_CREATED,
+        ["Location" => $location] , true);
+
+    }
+
+    
+
+    #[Route('/api/tacheProj/add', name: "createTacheProj" , methods:['POST'])]
+    public function createTacheProj(Request $request, SerializerInterface
+    $serializer, EntityManagerInterface $em, UrlGeneratorInterface
+    $urlGenerator, ValidatorInterface $validator, ProjetRepository $projetRepository): JsonResponse
+    {
+        $tache = $serializer -> deserialize($request -> getContent(), Taches_personel::class, 'json');
+        
+        //On vérifie les erreurs
+         $error = $validator -> validate ($tache);
+         if($error -> count() > 0 )
+        {
+             return new JsonResponse($serializer -> serialize($error,'json'), JsonResponse::HTTP_BAD_REQUEST,[],true);
+            //throw new HttpException(JsonResponse::HTTP_BAD_REQUEST,"la reuête est invalide");
+        }
+        
 
 
         $jsonTache = $serializer -> serialize($tache, 'json', ['groups' => 
