@@ -15,6 +15,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\Repository\DepartementRepository;
 use App\Repository\TypePersoRepository;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Mailer\MailerInterface;
@@ -22,11 +24,11 @@ use Symfony\Component\Mime\Email;
 use App\serices\MailService;
 use App\serices\MailController;
 
-
-
+use function PHPUnit\Framework\returnSelf;
 
 class PersonelController extends AbstractController
 {
+<<<<<<< HEAD
 
     public function __constructor(MailController $mailer)
     {
@@ -34,6 +36,10 @@ class PersonelController extends AbstractController
     }
   //  #[IsGranted('ROLE_ADMIN', message : "vous n \etes pas autorise a acceder a cette route")]
     
+=======
+  
+   // #[IsGranted('ROLE_ADMIN', message : "vous n \etes pas autorise a acceder a cette route")]
+>>>>>>> db2be9d7b16eac59f0a0f093a22a3df6fe23a2eb
     #[Route('/api/admin/personel', name:'Users',methods:['GET'])]
     
     public function index(PersonelRepository $respository,SerializerInterface $serializer):JsonResponse
@@ -79,6 +85,25 @@ class PersonelController extends AbstractController
         return new JsonResponse($jsonperso, Response::HTTP_OK, ['accept' => 'json'], true);
     }
 
+      
+    #[Route('api/nom/{username}', name: 'detailpersohy', methods: ['GET'])]
+
+    public function getusernameperso(PersonelRepository  $personel, SerializerInterface $serializer
+    , string  $username
+    ): JsonResponse 
+    {
+        $p=$personel->findOneBy(
+            array("username"=>$username)
+        );
+        // if(!$personel->isDeleted()){
+        //     $jsonperso = $serializer->serialize($personel, 'json',['groups'=>'getPersonel']);
+
+
+        // }
+        $jsonperso = $serializer->serialize($p, 'json',['groups'=>'getPersonel']);
+        return new JsonResponse($jsonperso, Response::HTTP_OK, ['accept' => 'json'],true);
+    }
+    
 
     //creation d un utilisateur
     /*
@@ -114,27 +139,29 @@ class PersonelController extends AbstractController
         return $this->Json($personel);
     }*/
 
-
+   // #[IsGranted('ROLE_ADMIN', message : "vous n \etes pas autorise a acceder a cette route")]
     #[Route('/api/admin/personel', name:"createperso", methods: ['POST'])]
     public function createperso(Request $request, SerializerInterface $serializer, EntityManagerInterface $em,DepartementRepository $departementRepository,TypePersoRepository $type,ValidatorInterface $validator): JsonResponse 
     {
 
+        
         $perso = $serializer->deserialize($request->getContent(), Personel::class, 'json');
         
-     
+        
         $content = $request->toArray();
         $errors = $validator->validate($perso);
-
         if ($errors->count() > 0) {
             return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
         }
-
         $idDep=$content['idDepartement'] ?? -1;
         $idtyp=$content['IdType'];
         $perso->setDepartement($departementRepository->find($idDep));
         $perso->setTypePerso($type->find($idtyp));
         $perso->setIschef(true);
         $perso->setDeleted(false);
+        $perso->setMdpChanged(false);
+        $perso->setNameChanged(false);
+
         $em->persist($perso);
         $em->flush();
 
@@ -172,20 +199,67 @@ class PersonelController extends AbstractController
         return $this->Json($data);
     }*/
 
-    #[Route('/api/admin/{id}', name:"updateBook", methods:['PUT'])]
+    #[Route('/api/update/{id}', name:"updateBook", methods:['PUT'])]
 
-    public function updatePerso(Request $request, SerializerInterface $serializer, Personel $Perso, EntityManagerInterface $em, DepartementRepository $departementRepository,TypePersoRepository $TypeReposity): JsonResponse 
+    public function updatePerso(Request $request, int $id, SerializerInterface $serializer, Personel $personel, EntityManagerInterface $em, PersonelRepository  $personelRepository, DepartementRepository $departementRepository,TypePersoRepository $TypeReposity , UserPasswordHasherInterface $hasher): JsonResponse 
     {
-        $updatedPerso= $serializer->deserialize($request->getContent(), 
-                Personel::class, 
-                'json', 
-                [AbstractNormalizer::OBJECT_TO_POPULATE => $Perso]);
-        $content = $request->toArray();
-        $idDep=$content['idDepartement'] ?? -1;
-        $idtyp=$content['IdType'];
-        $Perso->setDepartement($departementRepository->find($idDep));
-        $Perso->setTypePerso($TypeReposity->find($idtyp));
-        $em->persist($Perso);
+        $parameter = Json_decode($request->getContent(), true);
+
+        if (array_key_exists('password', $parameter) && $parameter['password'] != null && trim($parameter['password']) != '') {
+            $personel->setPassword($hasher->hashPassword($personel, trim($parameter['password'])));
+            $personel->setMdpChanged(true);
+        }
+
+        if (  array_key_exists('username', $parameter)  &&  $parameter['username'] != null && trim($parameter['username']) != '') {
+            $personel->setUsername(trim($parameter['username']));
+         }
+
+        // if ( array_key_exists('prenom', $parameter)  && $parameter['prenom'] && $parameter['prenom'] != null && trim($parameter['prenom']) != '') {
+        //     $personel->setPrenom(trim($parameter['prenom']));
+        // }
+
+        // if ( array_key_exists('nom', $parameter)   && $parameter['nom'] != null && trim($parameter['nom']) != '') {
+        //     $personel->setNom(trim($parameter['nom']));
+        // }
+
+        // if ( array_key_exists('adresse', $parameter) &&   $parameter['adresse'] != null && trim($parameter['adresse']) != '') {
+        //     $personel->setAdresse(trim($parameter['adresse']));
+        // }
+
+        // if ($parameter['date_naissance'] != null && trim($parameter['date_naissance']) != '') {
+        //     $personel->setDateNaissance(trim($parameter['date_naissance']));
+        // }
+        
+        // if (array_key_exists('contact', $parameter)  && $parameter['contact'] != null && trim($parameter['contact']) != '') {
+        //     $personel->setContact(trim($parameter['contact']));
+        // }
+        
+
+
+
+        // $updatedPerso = $serializer->deserialize(
+        //     $request->getContent(), 
+        //     Personel::class, 'json', 
+        //     [AbstractNormalizer::OBJECT_TO_POPULATE => $Perso]
+        // );
+
+        // $content = $request->toArray();
+
+        // $idDep = $content['idDepartement'] ?? -1;
+        // $idtyp = $content['IdType'] ?? -1; 
+
+        // $mdp=$updatedPerso->getPassword();
+
+        // $updatedPerso->setPassword($hasher->hashPassword($updatedPerso,$mdp));
+
+        // $updatedPerso->setMdpChanged(true);
+        // $Perso->setDepartement($departementRepository->find($idDep));
+
+        // $Perso->setTypePerso($TypeReposity->find($idtyp));
+
+        
+
+        $em->persist($personel);
         $em->flush();
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
@@ -194,7 +268,7 @@ class PersonelController extends AbstractController
    
     // effacer un utilisateur
     
-    //#[IsGranted('ROLE_ADMIN', message : "vous n \etes pas autorise a acceder a cette route")]
+   // #[IsGranted('ROLE_ADMIN', message : "vous n \etes pas autorise a acceder a cette route")]
     #[Route('api/admin/personel/{id}', name: 'deleteperso', methods: ['DELETE'])]
 
     public function deletedperso(Request $request, SerializerInterface $serializer, Personel $Perso, EntityManagerInterface $em)
@@ -220,8 +294,14 @@ class PersonelController extends AbstractController
 
 
     //creation de profil
+<<<<<<< HEAD
       #[Route('/api/admin/generate/{id}',name:'users_update', methods:['PUT'])]
     public  function personel( EntityManagerInterface $em,UserPasswordHasherInterface $hasher,Personel $personel, MailerInterface $mailer): Response
+=======
+   // #[IsGranted('ROLE_ADMIN', message : "vous n \etes pas autorise a acceder a cette route")]
+    #[Route('/api/admin/generate/{id}','users_update', methods:['PUT'])]
+    public  function personel( EntityManagerInterface $em,UserPasswordHasherInterface $hasher,Personel $personel): Response
+>>>>>>> db2be9d7b16eac59f0a0f093a22a3df6fe23a2eb
 
     {
        $usernname =  $this->random_str(6);
@@ -230,6 +310,7 @@ class PersonelController extends AbstractController
        $personel->setUsername($usernname);
        $personel->setPassword($hasher->hashPassword($personel, $password));
        $em->flush();
+<<<<<<< HEAD
        $message="votre identifant est: ";
        $messagee="votre mot de passe est:  ";
        $mailMessage=$message.''.$personel->getUsername(). '' . $messagee.''.$personel->getPassword();
@@ -246,7 +327,12 @@ class PersonelController extends AbstractController
 
         $mailer->send($email);
          return new JsonResponse(['username' => $usernname, 'password' => $password], JsonResponse::HTTP_OK);
+=======
+
+       return new JsonResponse(['username' => $usernname, 'password' => $password], JsonResponse::HTTP_OK);
+>>>>>>> db2be9d7b16eac59f0a0f093a22a3df6fe23a2eb
     }
+
     private function random_str($length){
         $random_string="";
         for($i=0;$i<$length;$i++){
@@ -257,6 +343,7 @@ class PersonelController extends AbstractController
         return $random_string;
 
     }
+<<<<<<< HEAD
 
 
 
@@ -338,6 +425,19 @@ $subject='Time for Symfony Mailer!';
 
 
 
+=======
+    
+    
+
+    #[Route('/api/token','users_token', methods:['GET'])]    
+    public function gestTokenUser(UserInterface $user , JWTTokenManagerInterface $Jwttoken): JsonResponse
+    {
+        return $this->json(data: [
+            'user'=> $user
+        ], status:Response::HTTP_OK, headers:[], context:['groups' => 'getPersonel']);
+        
+    }
+>>>>>>> db2be9d7b16eac59f0a0f093a22a3df6fe23a2eb
 
 
 
