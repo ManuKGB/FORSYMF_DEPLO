@@ -15,7 +15,7 @@ class Departement
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["getPersonel","get2"])]
+    #[Groups(["getPersonel","get2","get4","get6"])]
 
     private $id;
 
@@ -23,30 +23,33 @@ class Departement
     #[Assert\NotBlank(message: "Le libelle est obligatoire")]
     #[Assert\Length(min: 1, max: 255, minMessage: "Le libelle doit faire au moins {{ limit }} caractères", maxMessage: "Le libelle ne peut pas faire plus de {{ limit }} caractères")]
 
-    #[Groups(["getPersonel","get2"])]
+    #[Groups(["getPersonel","get2","get4","get6"])]
 
     private $libelle;
 
     #[ORM\Column(type: 'string', length: 400, nullable: true)]
 
-    #[Groups(["getPersonel","get2"])]
+    #[Groups(["getPersonel","get2","get4","get6"])]
 
     private $description;
 
     #[ORM\OneToMany(mappedBy: 'departement', targetEntity: Personel::class)]
     
 
-    #[Groups(["get2","get3"])]
+    #[Groups(["get2","get3","get6"])]
     private $personel;
 
     #[ORM\Column]
-    #[Groups(["getPersonel","get2"])]
+    #[Groups(["getPersonel","get2","get4","get6"])]
     private ?bool $deleted = null;
 
+    #[ORM\ManyToOne(inversedBy: 'departements')]
+    #[Groups(["get6"])]
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?Personel $chef = null;
+    private ?personel $chef = null;
 
+
+    
     public function __construct()
     {
         $this->personel = new ArrayCollection();
@@ -123,12 +126,12 @@ class Departement
         return $this;
     }
 
-    public function getChef(): ?Personel
+    public function getChef(): ?personel
     {
         return $this->chef;
     }
 
-    public function setChef(?Personel $chef): self
+    public function setChef(?personel $chef): self
     {
         $this->chef = $chef;
 

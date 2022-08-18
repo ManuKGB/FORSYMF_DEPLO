@@ -17,12 +17,21 @@ use App\Repository\DepartementRepository;
 use App\Repository\TypePersoRepository;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use App\serices\MailService;
+use App\serices\MailController;
 
 
 
 
 class PersonelController extends AbstractController
 {
+
+    public function __constructor(MailController $mailer)
+    {
+
+    }
   //  #[IsGranted('ROLE_ADMIN', message : "vous n \etes pas autorise a acceder a cette route")]
     
     #[Route('/api/admin/personel', name:'Users',methods:['GET'])]
@@ -31,6 +40,21 @@ class PersonelController extends AbstractController
     {
        $personel=$respository->findBy(
         array('deleted'=>0),
+       );
+        $result=$serializer->serialize($personel, 'json', ['groups' => 'getPersonel']); 
+        return new JsonResponse($result, Response::HTTP_OK, ['accept' => 'json'], true);
+
+        // return $this->json($respository->findAll(), Response::HTTP_OK, [], ['groups'=>'getPersonel']);
+    }
+
+
+    //profilget
+    #[Route('/api/admin/personele', name:'Userse',methods:['GET'])]
+    
+    public function indexe(PersonelRepository $respository,SerializerInterface $serializer):JsonResponse
+    {
+       $personel=$respository->findBy(
+        array('username'=>null),
        );
         $result=$serializer->serialize($personel, 'json', ['groups' => 'getPersonel']); 
         return new JsonResponse($result, Response::HTTP_OK, ['accept' => 'json'], true);
@@ -109,13 +133,14 @@ class PersonelController extends AbstractController
         $idtyp=$content['IdType'];
         $perso->setDepartement($departementRepository->find($idDep));
         $perso->setTypePerso($type->find($idtyp));
+        $perso->setIschef(true);
         $perso->setDeleted(false);
         $em->persist($perso);
         $em->flush();
 
         $jsonPerso = $serializer->serialize($perso, 'json', ['groups' => 'getPersonel']);
 
-        return new JsonResponse($jsonPerso, Response::HTTP_CREATED);
+        return new JsonResponse($jsonPerso, Response::HTTP_CREATED,[],true);
    }
 
 
@@ -195,8 +220,8 @@ class PersonelController extends AbstractController
 
 
     //creation de profil
-      #[Route('/api/admin/generate/{id}','users_update', methods:['PUT'])]
-    public  function personel( EntityManagerInterface $em,UserPasswordHasherInterface $hasher,Personel $personel): Response
+      #[Route('/api/admin/generate/{id}',name:'users_update', methods:['PUT'])]
+    public  function personel( EntityManagerInterface $em,UserPasswordHasherInterface $hasher,Personel $personel, MailerInterface $mailer): Response
 
     {
        $usernname =  $this->random_str(6);
@@ -205,6 +230,21 @@ class PersonelController extends AbstractController
        $personel->setUsername($usernname);
        $personel->setPassword($hasher->hashPassword($personel, $password));
        $em->flush();
+       $message="votre identifant est: ";
+       $messagee="votre mot de passe est:  ";
+       $mailMessage=$message.''.$personel->getUsername(). '' . $messagee.''.$personel->getPassword();
+       $email = (new Email())
+            ->from('tunde.binessicr7@gmailCom')
+            ->to('caleb.binessi12@gmail.com')
+            //->cc('cc@example.com')
+            //->bcc('bcc@example.com')
+            //->replyTo('fabien@example.com')
+            //->priority(Email::PRIORITY_HIGH)
+            ->subject('Time for Symfony Mailer!')
+            ->text('Sending emails is fun again!')
+            ->html('<p>See Twig integration for better HTML integration!</p>');
+
+        $mailer->send($email);
          return new JsonResponse(['username' => $usernname, 'password' => $password], JsonResponse::HTTP_OK);
     }
     private function random_str($length){
@@ -238,7 +278,67 @@ class PersonelController extends AbstractController
 
 //         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
 //    }
+
+
+
+
+
+/*public function sendEmail(MailerInterface $mailer):void {
+    $to='caleb.binessi12@gmail.com';
+    $content='<p>See Twig integration for better HTML integration!</p>';
+    $subject='Time for Symfony Mailer!';
     
+    $email = (new Email())
+        ->from('tunde.binessicr7@gmail.com')
+        ->to($to)
+        //->cc('cc@example.com')
+        //->bcc('bcc@example.com')
+        //->replyTo('fabien@example.com')
+        //->priority(Email::PRIORITY_HIGH)
+        ->subject('Time for Symfony Mailer!')
+        ->text($subject)
+        ->html( $content);
+
+    $mailer->send($email);
+
+    // ...
+}*/
+
+
+#[Route('/api/admin/testee',name:'users_updatee', methods:['GET'])]
+public  function personele(  MailerInterface $mailer): Response{
+
+$to='caleb.binessi12@gmail.com';
+$content='<p>See Twig integration for better HTML integration!</p>';
+$subject='Time for Symfony Mailer!';
+
+{
+   $email = (new Email())
+        ->from('tunde.binessicr7@gmailCom')
+        ->to($to)
+        //->cc('cc@example.com')
+        //->bcc('bcc@example.com')
+        //->replyTo('fabien@example.com')
+        //->priority(Email::PRIORITY_HIGH)
+        ->subject($subject)
+        ->text('Sending emails is fun again!')
+        ->html($content);
+
+    $mailer->send($email);
+     return new JsonResponse($email, JsonResponse::HTTP_OK);
+}
+}
+
+
+// 
+// Qu'est ce que tu voulais deja? j'ai forget
+//  affecter chef -----------ouvre le controlleur qui fait as 
+//oui est la fonction
+//c'est maintenant on dois faire ça   on fait quoi dab?-------------- je dois voir d'abord ce que je fais  
+
+
+
+
 
 
 

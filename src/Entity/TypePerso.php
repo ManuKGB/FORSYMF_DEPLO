@@ -15,27 +15,27 @@ class TypePerso
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     
-    #[Groups(["getPersonel","get2"])]
+    #[Groups(["getPersonel","get2","get4","get6"])]
 
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank(message: "Le libelle est obligatoire")]
-    #[Groups(["getPersonel","get2"])]
+    #[Groups(["getPersonel","get2","get4","get6"])]
     private $libelle;
 
     #[ORM\Column(type: 'string', length: 300, nullable: true)]
-    #[Groups(["getPersonel","get2"])]
+    #[Groups(["getPersonel","get2","get4","get6"])]
     private $description;
 
     #[ORM\OneToMany(mappedBy: 'typePerso', targetEntity: Personel::class)]
-    #[Groups(["get2"])]
+    #[Groups(["get4"])]
 
     
     private $Personel;
 
     #[ORM\Column]
-    #[Groups(["getPersonel","get2"])]
+    #[Groups(["getPersonel","get2","get4","get6"])]
     private ?bool $deleted = null;
 
     public function __construct()

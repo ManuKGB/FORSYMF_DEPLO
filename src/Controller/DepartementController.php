@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use App\Repository\PersonelRepository;
+use App\Entity\Personel;
+use Doctrine\ORM\Mapping\Id;
 
 class DepartementController extends AbstractController
 
@@ -49,7 +51,7 @@ class DepartementController extends AbstractController
         $departementList = $departementRepository->findBy(
             array('deleted'=>0),
         );
-        $jsondepartementList = $serializer->serialize($departementList, 'json',['groups'=>'get2']);
+        $jsondepartementList = $serializer->serialize($departementList, 'json',['groups'=>'get6']);
         return new JsonResponse($jsondepartementList, Response::HTTP_OK, [], true);
     }
 
@@ -90,7 +92,7 @@ class DepartementController extends AbstractController
     {
         if(!$departement->isDeleted()){
             //foreach($departement)
-            $jsonBook = $serializer->serialize($departement, 'json',['groups'=>'get2']);
+            $jsonBook = $serializer->serialize($departement, 'json',['groups'=>'get6']);
             return new JsonResponse($jsonBook, Response::HTTP_OK, ['accept' => 'json'], true);
         }
         elseif($departement && $departement->isDeleted()){
@@ -134,21 +136,35 @@ class DepartementController extends AbstractController
 
 
     //perso du departements
-    #[Route('api/admin/departements/perso/{id}', name: 'detaildepartementt', methods: ['PUT','GET'])]
-    public function getDetaildepartementt(Departement $departement, SerializerInterface $serializer,EntityManagerInterface $em) 
+    #[Route('api/admin/departements/{id}/chef/{id2}', name: 'detaildepartementt', methods: ['PUT'])]
+    public function getDetaildepartementt(Departement $departement, SerializerInterface $serializer,EntityManagerInterface $em, 
+    PersonelRepository $personelRepository, DepartementRepository $departementReposity,int $id,int $id2) 
     {
         if(!$departement->isDeleted()){
-            //foreach($departement)
+            $jsonBook = $serializer->serialize($departement, 'json',['groups'=>'get5']);
+            $data = $departementReposity->find($id);
+            $chef = $personelRepository->find($id2);
+            $x=array();
+            $chef->getId();
+            $data->setChef($chef);
+            $em->persist($data);
+            $em->flush();
 
-            $jsonBook = $serializer->serialize($departement, 'json',['groups'=>'get3']);
+            // foreach($data->getPersonel() as $personnel) {
+            //     if ($personnel->getId() != $chef->getId()) {
+            //         $personnel->setPersonel($chef);
+            //         $em->persist($personnel);
+            //         $em->flush();
 
-            // foreach($jsonBook    as $one ){
-            //     $one->setNom("qjhb,dq");
-            //     $em->flush();
-
+            //     }
             // }
-
-            return new JsonResponse($jsonBook, Response::HTTP_OK, ['accept' => 'json'], true);
+            // $personnel->setIschef(false);
+            // $em->persist($personnel);
+            // $em->flush();
+            
+            $jsonBook = $serializer->serialize($data, 'json',['groups'=>'get2']);
+            // return new JsonResponse($data->getPersonel()[0]->getpersonelname());
+             return new JsonResponse("", Response::HTTP_OK,[],true);
         }
         elseif($departement && $departement->isDeleted()){
             $x=array(
@@ -161,6 +177,7 @@ class DepartementController extends AbstractController
     }
 
 
+    
 
 
 
