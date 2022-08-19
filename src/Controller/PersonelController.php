@@ -3,7 +3,6 @@
 namespace App\Controller;
 use App\Entity\Personel;
 use App\Repository\PersonelRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,39 +55,7 @@ class PersonelController extends AbstractController
     }
 
 
-    //creation d un utilisateur
-    /*
-  //  #[IsGranted('ROLE_ADMIN', message : "vous n \etes pas autorise a acceder a cette route")]
-    #[Route('/api/admin', name:'users_symfony', methods:['POST'])]
-    public function creation(Request $request , EntityManagerInterface $em, UserPasswordHasherInterface $hasher,DepartementRepository $departement,PersonelRepository $personel, SerializerInterface $serializer):JsonResponse
-
-    {
-        $personel= new Personel();
-        $parameter =Json_decode($request->getContent(), true);
-       // $idDep=$parameter['idDepartement'] ?? -1;
-       // $personel->setDepartement($departement->find($idDep));
-
-
-        
-        $personel->setNom($parameter['nom']);
-        $personel->setRoles($parameter['roles']);
-        $personel->setPassword($hasher->hashPassword($personel, $parameter['password']));
-        $personel->setPrenom($parameter['prenom']);
-
-        $dt=new DateTime();
-        $date=$dt->createFromFormat("y-m-d", date("y-m-d", (int) $parameter['date_naissance'] ) );
-        $personel->setDateNaissance(($date));
-        $personel->setAdresse($parameter['adresse']);
-        $personel->setEmail($parameter['email']); 
-        $personel->setContact($parameter['contact']); 
-        $personel->setDepartement($parameter['departement_id']);
-    
-
-        $em->persist($personel);
-        $em->flush();
-
-        return $this->Json($personel);
-    }*/
+   
 
 
     #[Route('/api/admin/personel', name:"createperso", methods: ['POST'])]
@@ -118,34 +85,6 @@ class PersonelController extends AbstractController
         return new JsonResponse($jsonPerso, Response::HTTP_CREATED);
    }
 
-
-
-
-// modification d un utilisateur
-   // #[IsGranted('ROLE_ADMIN', message : "vous n \etes pas autorise a acceder a cette route")]
-    /*#[Route('/api/admin/{id}','users_update', methods:['PUT'])]
-    public  function update_users(Request $request, $id,  EntityManagerInterface $em , PersonelRepository $respository,ValidatorInterface $validator,SerializerInterface $serializer): Response
-
-    {
-        $data = $respository->find($id);
-
-        $parameter=Json_decode($request->getContent(), true);
-        
-        $data->setNom($parameter['nom']);
-       // $data->setRoles(['ROLE_USER']);
-        $data->setPrenom($parameter['prenom']);
-        $dt=new DateTime();
-        $date=$dt->createFromFormat("y-m-d", date("y-m-d", (int) $parameter['date_naissance'] ) );
-        $data->setDateNaissance(($date));
-        $data->setAdresse($parameter['adresse']);
-        $data->setEmail($parameter['email']); 
-        $data->setContact($parameter['contact']); 
-
-        
-        $em->persist($data);
-        $em->flush();
-        return $this->Json($data);
-    }*/
 
     #[Route('/api/admin/{id}', name:"updateBook", methods:['PUT'])]
 
@@ -217,28 +156,6 @@ class PersonelController extends AbstractController
         return $random_string;
 
     }
-
-
-
-//     #[Route('/api/admin/{id}', name:"update", methods:['PUT'])]
-
-//     public function updatePersoo(Request $request, SerializerInterface $serializer, Personel $Perso, EntityManagerInterface $em, DepartementRepository $departementRepository,TypePersoRepository $TypeReposity): JsonResponse 
-//     {
-//         $updatedPerso= $serializer->deserialize($request->getContent(), 
-//                 Personel::class, 
-//                 'json', 
-//                 [AbstractNormalizer::OBJECT_TO_POPULATE => $Perso]);
-//         $content = $request->toArray();
-//         $idDep=$content['idDepartement'] ?? -1;
-//         $idtyp=$content['IdType'];
-//         $Perso->setDepartement($departementRepository->find($idDep));
-//         $Perso->setTypePerso($TypeReposity->find($idtyp));
-//         $em->persist($Perso);
-//         $em->flush();
-
-//         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
-//    }
-    
 
 
 
