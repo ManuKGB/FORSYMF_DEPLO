@@ -21,25 +21,13 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
-use App\serices\MailService;
-use App\serices\MailController;
 
-use function PHPUnit\Framework\returnSelf;
 
 class PersonelController extends AbstractController
 {
-<<<<<<< HEAD
 
-    public function __constructor(MailController $mailer)
-    {
-
-    }
   //  #[IsGranted('ROLE_ADMIN', message : "vous n \etes pas autorise a acceder a cette route")]
     
-=======
-  
-   // #[IsGranted('ROLE_ADMIN', message : "vous n \etes pas autorise a acceder a cette route")]
->>>>>>> db2be9d7b16eac59f0a0f093a22a3df6fe23a2eb
     #[Route('/api/admin/personel', name:'Users',methods:['GET'])]
     
     public function index(PersonelRepository $respository,SerializerInterface $serializer):JsonResponse
@@ -199,20 +187,20 @@ class PersonelController extends AbstractController
         return $this->Json($data);
     }*/
 
-    #[Route('/api/update/{id}', name:"updateBook", methods:['PUT'])]
+    // #[Route('/api/update/{id}', name:"updateBook", methods:['PUT'])]
 
-    public function updatePerso(Request $request, int $id, SerializerInterface $serializer, Personel $personel, EntityManagerInterface $em, PersonelRepository  $personelRepository, DepartementRepository $departementRepository,TypePersoRepository $TypeReposity , UserPasswordHasherInterface $hasher): JsonResponse 
-    {
-        $parameter = Json_decode($request->getContent(), true);
+    // public function updatePerso(Request $request, int $id, SerializerInterface $serializer, Personel $personel, EntityManagerInterface $em, PersonelRepository  $personelRepository, DepartementRepository $departementRepository,TypePersoRepository $TypeReposity , UserPasswordHasherInterface $hasher): JsonResponse 
+    // {
+    //     $parameter = Json_decode($request->getContent(), true);
 
-        if (array_key_exists('password', $parameter) && $parameter['password'] != null && trim($parameter['password']) != '') {
-            $personel->setPassword($hasher->hashPassword($personel, trim($parameter['password'])));
-            $personel->setMdpChanged(true);
-        }
+    //     if (array_key_exists('password', $parameter) && $parameter['password'] != null && trim($parameter['password']) != '') {
+    //         $personel->setPassword($hasher->hashPassword($personel, trim($parameter['password'])));
+    //         $personel->setMdpChanged(true);
+    //     }
 
-        if (  array_key_exists('username', $parameter)  &&  $parameter['username'] != null && trim($parameter['username']) != '') {
-            $personel->setUsername(trim($parameter['username']));
-         }
+    //     if (  array_key_exists('username', $parameter)  &&  $parameter['username'] != null && trim($parameter['username']) != '') {
+    //         $personel->setUsername(trim($parameter['username']));
+    //      }
 
         // if ( array_key_exists('prenom', $parameter)  && $parameter['prenom'] && $parameter['prenom'] != null && trim($parameter['prenom']) != '') {
         //     $personel->setPrenom(trim($parameter['prenom']));
@@ -259,7 +247,26 @@ class PersonelController extends AbstractController
 
         
 
-        $em->persist($personel);
+//         $em->persist($personel);
+//         $em->flush();
+
+//         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+//    }
+
+#[Route('/api/admin/{id}', name:"updateBook", methods:['PUT'])]
+
+    public function updatePerso(Request $request, SerializerInterface $serializer, Personel $Perso, EntityManagerInterface $em, DepartementRepository $departementRepository,TypePersoRepository $TypeReposity): JsonResponse 
+    {
+        $updatedPerso= $serializer->deserialize($request->getContent(), 
+                Personel::class, 
+                'json', 
+                [AbstractNormalizer::OBJECT_TO_POPULATE => $Perso]);
+        $content = $request->toArray();
+        $idDep=$content['idDepartement'] ?? -1;
+        $idtyp=$content['IdType'];
+        $Perso->setDepartement($departementRepository->find($idDep));
+        $Perso->setTypePerso($TypeReposity->find($idtyp));
+        $em->persist($Perso);
         $em->flush();
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
@@ -294,14 +301,9 @@ class PersonelController extends AbstractController
 
 
     //creation de profil
-<<<<<<< HEAD
-      #[Route('/api/admin/generate/{id}',name:'users_update', methods:['PUT'])]
-    public  function personel( EntityManagerInterface $em,UserPasswordHasherInterface $hasher,Personel $personel, MailerInterface $mailer): Response
-=======
    // #[IsGranted('ROLE_ADMIN', message : "vous n \etes pas autorise a acceder a cette route")]
     #[Route('/api/admin/generate/{id}','users_update', methods:['PUT'])]
     public  function personel( EntityManagerInterface $em,UserPasswordHasherInterface $hasher,Personel $personel): Response
->>>>>>> db2be9d7b16eac59f0a0f093a22a3df6fe23a2eb
 
     {
        $usernname =  $this->random_str(6);
@@ -310,7 +312,6 @@ class PersonelController extends AbstractController
        $personel->setUsername($usernname);
        $personel->setPassword($hasher->hashPassword($personel, $password));
        $em->flush();
-<<<<<<< HEAD
        $message="votre identifant est: ";
        $messagee="votre mot de passe est:  ";
        $mailMessage=$message.''.$personel->getUsername(). '' . $messagee.''.$personel->getPassword();
@@ -325,12 +326,8 @@ class PersonelController extends AbstractController
             ->text('Sending emails is fun again!')
             ->html('<p>See Twig integration for better HTML integration!</p>');
 
-        $mailer->send($email);
+       
          return new JsonResponse(['username' => $usernname, 'password' => $password], JsonResponse::HTTP_OK);
-=======
-
-       return new JsonResponse(['username' => $usernname, 'password' => $password], JsonResponse::HTTP_OK);
->>>>>>> db2be9d7b16eac59f0a0f093a22a3df6fe23a2eb
     }
 
     private function random_str($length){
@@ -343,7 +340,6 @@ class PersonelController extends AbstractController
         return $random_string;
 
     }
-<<<<<<< HEAD
 
 
 
@@ -415,31 +411,5 @@ $subject='Time for Symfony Mailer!';
      return new JsonResponse($email, JsonResponse::HTTP_OK);
 }
 }
-
-
-// 
-// Qu'est ce que tu voulais deja? j'ai forget
-//  affecter chef -----------ouvre le controlleur qui fait as 
-//oui est la fonction
-//c'est maintenant on dois faire ça   on fait quoi dab?-------------- je dois voir d'abord ce que je fais  
-
-
-
-=======
-    
-    
-
-    #[Route('/api/token','users_token', methods:['GET'])]    
-    public function gestTokenUser(UserInterface $user , JWTTokenManagerInterface $Jwttoken): JsonResponse
-    {
-        return $this->json(data: [
-            'user'=> $user
-        ], status:Response::HTTP_OK, headers:[], context:['groups' => 'getPersonel']);
-        
-    }
->>>>>>> db2be9d7b16eac59f0a0f093a22a3df6fe23a2eb
-
-
-
 
 }

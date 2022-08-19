@@ -65,13 +65,8 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
     private $contact;
 
     #[ORM\ManyToOne(targetEntity: Departement::class, inversedBy: 'personel')]
-<<<<<<< HEAD
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(["getPersonel","get4"])]
-=======
-    #[ORM\JoinColumn(nullable: true)]
-    #[Groups(["getPersonel"])]
->>>>>>> db2be9d7b16eac59f0a0f093a22a3df6fe23a2eb
    
     private $departement;
 
@@ -81,13 +76,8 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
  
     private $personel;
     #[ORM\ManyToOne(targetEntity: TypePerso::class, inversedBy: 'Personel')]
-<<<<<<< HEAD
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(["getPersonel","get2","get6"])]
-=======
-    #[ORM\JoinColumn(nullable: true)]
-    #[Groups(["getPersonel"])]
->>>>>>> db2be9d7b16eac59f0a0f093a22a3df6fe23a2eb
     
     private $typePerso;
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -342,7 +332,6 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-<<<<<<< HEAD
     /**
      * @return Collection<int, Personel>
      */
@@ -387,21 +376,10 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
             $this->departements[] = $departement;
             $departement->setChef($this);
         }
-=======
-    public function isMdpChanged(): ?bool
-    {
-        return $this->mdp_changed;
-    }
-
-    public function setMdpChanged(?bool $mdp_changed): self
-    {
-        $this->mdp_changed = $mdp_changed;
->>>>>>> db2be9d7b16eac59f0a0f093a22a3df6fe23a2eb
 
         return $this;
     }
 
-<<<<<<< HEAD
     public function removeDepartement(Departement $departement): self
     {
         if ($this->departements->removeElement($departement)) {
@@ -413,30 +391,4 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-=======
-    public function isNameChanged(): ?bool
-    {
-        return $this->name_changed;
-    }
-
-    public function setNameChanged(?bool $name_changed): self
-    {
-        $this->name_changed = $name_changed;
-
-        return $this;
-    }
-
-    public function getProfileImage(): ?string
-    {
-        return $this->ProfileImage;
-    }
-
-    public function setProfileImage(string $ProfileImage): self
-    {
-        $this->ProfileImage = $ProfileImage;
-
-        return $this;
-    }
-
->>>>>>> db2be9d7b16eac59f0a0f093a22a3df6fe23a2eb
 }
