@@ -31,7 +31,7 @@ class TypePersoController extends AbstractController
     #[Route('api/admin/types/{id}', name: 'detailtype', methods: ['GET'])]
     public function getDetailtype(TypePerso $type, SerializerInterface $serializer)
     { if(!$type->isDeleted()){
-        $jsonBook = $serializer->serialize($type, 'json',['groups'=>'get2']);
+        $jsonBook = $serializer->serialize($type, 'json',['groups'=>'get4']);
         return new JsonResponse($jsonBook, Response::HTTP_OK, ['accept' => 'json'], true);
     }
     elseif($type && $type->isDeleted()){

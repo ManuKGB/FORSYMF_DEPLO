@@ -24,12 +24,12 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["getPersonel", "gettaches"])]
+    #[Groups(["getPersonel","get2","get3","get4","get5","get6"])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
         
-    #[Groups(["getPersonel", "gettaches"])]
+    #[Groups(["getPersonel","get2","get3","get4","get5","get6"])]
     private $nom;
 
     #[ORM\Column(type: 'json')]
@@ -42,72 +42,88 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank(message: "Le prenom est obligatoire")]
-    #[Assert\Length(min: 1, max: 255, minMessage: "Le prenom doit faire au moins {{ limit }} caractères", maxMessage: "Le prenom ne peut pas faire plus de {{ limit }} caractères")]
-    #[Groups(["getPersonel", "gettaches"])]
+    #[Assert\Length(min: 1, max: 255, minMessage: "Le prenom doit faire au moins {{ limit }} caractères",
+    maxMessage: "Le prenom ne peut pas faire plus de {{ limit }} caractères")]
+    #[Groups(["getPersonel","get2","get3","get4","get5","get6"])]
     private $prenom;
 
     #[ORM\Column(type: 'date',nullable: true)]
-    #[Groups(["getPersonel", "gettaches"])]
+    #[Groups(["getPersonel","get2","get3","get4","get5","get6"])]
     private $date_naissance;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank(message: "L'adresse est obligatoire")]
     #[Assert\Length(min: 1, max: 255, minMessage: "L'adresse doit faire au moins {{ limit }} caractères", maxMessage: "L'adresse ne peut pas faire plus de {{ limit }} caractères")] 
-    #[Groups(["getPersonel", "gettaches"])]
+    #[Groups(["getPersonel","get2","get3","get4","get5","get6"])]
     private $adresse;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank(message: "L'email est obligatoire")]
     #[Assert\Length(min: 1, max: 255, minMessage: "L'email doit faire au moins {{ limit }} caractères", maxMessage: "L'email ne peut pas faire plus de {{ limit }} caractères")]
-    #[Groups(["getPersonel", "gettaches"])]
+    #[Groups(["getPersonel","get2","get3","get4","get5","get6"])]
     private $email;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank(message: "Le contact est obligatoire")]
     #[Assert\Length(min: 1, max: 255, minMessage: "Le contact doit faire au moins {{ limit }} caractères", maxMessage: "Le contact ne peut pas faire plus de {{ limit }} caractères")]
-    #[Groups(["getPersonel", "gettaches"])]
+    #[Groups(["getPersonel","get2","get3","get4","get5","get6"])]
     private $contact;
 
     #[ORM\ManyToOne(targetEntity: Departement::class, inversedBy: 'personel')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["getPersonel", "gettaches"])]
+    #[Groups(["getPersonel","get4"])]
    
     private $departement;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'chef')]
     #[ORM\JoinColumn(nullable: true)]
+    #[Groups(["get3","get5"])]
  
     private $personel;
-
-    #[ORM\OneToMany(mappedBy: 'personel', targetEntity: self::class)]
-    #[Groups(["getPersonel", "gettaches"])]
-    private $chef;
-    
     #[ORM\ManyToOne(targetEntity: TypePerso::class, inversedBy: 'Personel')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["getPersonel", "gettaches"])]
+    #[Groups(["getPersonel","get2","get6"])]
     
     private $typePerso;
-
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(["getPersonel", "gettaches"])]
     private $username;
 
     #[ORM\Column]
-    #[Groups(["getPersonel", "gettaches"])]
+    #[Groups(["get2","get4","getPersonel","get6"])] 
     private ?bool $deleted = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(["getPersonel","get2","get3","get4","get5","get6"])]
     private ?bool $ischef = null;
+    #[Groups(["getPersonel"])]
+    #[ORM\Column(nullable: true)]
+    private ?bool $mdp_changed = null;
+    #[Groups(["getPersonel"])]
+    #[ORM\Column(nullable: true)]
+    private ?bool $name_changed = null;
+
+    #[ORM\Column(length: 255,  nullable: true)]
+    private ?string $ProfileImage = null;
+
+    #[ORM\OneToMany(mappedBy: 'chef', targetEntity: Personel::class)]
+    
+   
+    
+    private Collection $personels;
+
+    #[ORM\OneToMany(mappedBy: 'chef', targetEntity: Departement::class)]
+    private Collection $departements;
 
     #[ORM\ManyToMany(targetEntity: Taches::class, mappedBy: 'attribuer')]
-    #[Groups([ "gettaches"])]
+    #[Groups([ "getPersonel","gettaches","get2","get3","get4","get5","get6"])]
     private Collection $taches;
 
     public function __construct()
     {
         $this->chef = new ArrayCollection();
-        $this->taches = new ArrayCollection();
+        $this->personels = new ArrayCollection();
+        $this->departements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -159,7 +175,7 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see PasswordAuthenticatedpersonelInterface
      */
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -276,32 +292,6 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, self>
      */
-    public function getChef(): Collection
-    {
-        return $this->chef;
-    }
-
-    public function addChef(self $chef): self
-    {
-        if (!$this->chef->contains($chef)) {
-            $this->chef[] = $chef;
-            $chef->setPersonel($this);
-        }
-
-        return $this;
-    }
-
-    public function removeChef(self $chef): self
-    {
-        if ($this->chef->removeElement($chef)) {
-            // set the owning side to null (unless already changed)
-            if ($chef->getPersonel() === $this) {
-                $chef->setPersonel(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getTypePerso(): ?TypePerso
     {
@@ -352,27 +342,60 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Taches>
+     * @return Collection<int, Personel>
      */
-    public function getTaches(): Collection
+    public function getPersonels(): Collection
     {
-        return $this->taches;
+        return $this->personels;
     }
 
-    public function addTach(Taches $tach): self
+    // public function addPersonel(Personel $personel): self
+    // {
+    //     if (!$this->personels->contains($personel)) {
+    //         $this->personels[] = $personel;
+    //         $personel->setChef($this);
+    //     }
+
+    //     return $this;
+    // }
+
+    // public function removePersonel(Personel $personel): self
+    // {
+    //     if ($this->personels->removeElement($personel)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($personel->getChef() === $this) {
+    //             $personel->setChef();
+    //         }
+    //     }
+
+    //     return $this;
+    // }
+
+    /**
+     * @return Collection<int, Departement>
+     */
+    public function getDepartements(): Collection
     {
-        if (!$this->taches->contains($tach)) {
-            $this->taches[] = $tach;
-            $tach->addAttribuer($this);
+        return $this->departements;
+    }
+
+    public function addDepartement(Departement $departement): self
+    {
+        if (!$this->departements->contains($departement)) {
+            $this->departements[] = $departement;
+            $departement->setChef($this);
         }
 
         return $this;
     }
 
-    public function removeTach(Taches $tach): self
+    public function removeDepartement(Departement $departement): self
     {
-        if ($this->taches->removeElement($tach)) {
-            $tach->removeAttribuer($this);
+        if ($this->departements->removeElement($departement)) {
+            // set the owning side to null (unless already changed)
+            if ($departement->getChef() === $this) {
+                $departement->setChef(null);
+            }
         }
 
         return $this;
