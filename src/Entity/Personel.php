@@ -391,4 +391,34 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+	/**
+	 * @return ?bool
+	 */
+	function getMdpChanged(): ?bool {
+		return $this->mdp_changed;
+	}
+	
+	/**
+	 * @param ?bool $mdp_changed 
+	 * @return Personel
+	 */
+	function setMdpChanged(?bool $mdp_changed): self {
+		$this->mdp_changed = $mdp_changed;
+		return $this;
+	}
+	/**
+	 * @return ?bool
+	 */
+	function getNameChanged(): ?bool {
+		return $this->name_changed;
+	}
+	
+	/**
+	 * @param ?bool $name_changed 
+	 * @return Personel
+	 */
+	function setNameChanged(?bool $name_changed): self {
+		$this->name_changed = $name_changed;
+		return $this;
+	}
 }
