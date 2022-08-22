@@ -13,7 +13,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\personel\PasswordAuthenticatedpersonelInterface;
 use Symfony\Component\Security\Core\personel\personelInterface;
-// use Webmozart\Assert\Assert;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
@@ -400,4 +399,49 @@ class Personel implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+	/**
+	 * @return ?bool
+	 */
+	function getMdp_changed(): ?bool {
+		return $this->mdp_changed;
+	}
+	
+	/**
+	 * @param ?bool $mdp_changed 
+	 * @return Personel
+	 */
+	function setMdp_changed(?bool $mdp_changed): self {
+		$this->mdp_changed = $mdp_changed;
+		return $this;
+	}
+	/**
+	 * @return ?bool
+	 */
+	function getName_changed(): ?bool {
+		return $this->name_changed;
+	}
+	
+	/**
+	 * @param ?bool $name_changed 
+	 * @return Personel
+	 */
+	function setName_changed(?bool $name_changed): self {
+		$this->name_changed = $name_changed;
+		return $this;
+	}
+	/**
+	 * @return ?string
+	 */
+	function getProfileImage(): ?string {
+		return $this->ProfileImage;
+	}
+	
+	/**
+	 * @param ?string $ProfileImage 
+	 * @return Personel
+	 */
+	function setProfileImage(?string $ProfileImage): self {
+		$this->ProfileImage = $ProfileImage;
+		return $this;
+	}
 }

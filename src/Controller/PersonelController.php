@@ -14,8 +14,6 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\Repository\DepartementRepository;
 use App\Repository\TypePersoRepository;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Mailer\MailerInterface;
@@ -82,11 +80,7 @@ class PersonelController extends AbstractController
         $p=$personel->findOneBy(
             array("username"=>$username)
         );
-        // if(!$personel->isDeleted()){
-        //     $jsonperso = $serializer->serialize($personel, 'json',['groups'=>'getPersonel']);
-
-
-        // }
+  
         $jsonperso = $serializer->serialize($p, 'json',['groups'=>'getPersonel']);
         return new JsonResponse($jsonperso, Response::HTTP_OK, ['accept' => 'json'],true);
     }

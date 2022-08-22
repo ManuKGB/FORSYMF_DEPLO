@@ -73,9 +73,12 @@ class NotificationController extends AbstractController
             //throw new HttpException(JsonResponse::HTTP_BAD_REQUEST,"la reuête est invalide");
         }
          
-            $notification->setcodeNotif('code441');
-        
-        
+            // $notification->setcodeNotif('code441');
+        $cod=$notification->getContenuNotif();
+      
+        $rslt=mb_substr($cod, 0, 4).rand(100,9999);
+                    
+        $notification->setCodeNotif($rslt);
         
         $em -> persist($notification);
         $em -> flush();
